@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MolSight{% block title %}{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                "surface-container-lowest": "#ffffff",
+                "on-background": "#1a1c1a",
+                "primary-container": "#a6c48a",
+                "outline-variant": "#c4c8ba",
+                "on-surface-variant": "#44483e",
+                "background": "#f9faf6",
+                "surface-container": "#edeeea",
+                "surface-container-high": "#e7e9e5",
+                "tertiary": "#476362",
+                "on-primary-container": "#385123",
+                "primary": "#4c6635",
+                "surface": "#f9faf6",
+                "surface-container-low": "#f3f4f0",
+                "surface-variant": "#e2e3df",
+                "error": "#ba1a1a",
+                "on-surface": "#1a1c1a",
+                "on-primary": "#ffffff",
+                "outline": "#74796d",
+                "secondary": "#486550"
+            },
+            borderRadius: { "lg": "1rem", "xl": "1.25rem", "full": "9999px" },
+            fontFamily: {
+                "headline": ["Newsreader", "serif"],
+                "body": ["Manrope", "sans-serif"],
+                "label": ["Manrope", "sans-serif"]
+            }
+        }
+    }
+}
+</script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .ambient-shadow { box-shadow: 0px 10px 40px rgba(26, 28, 26, 0.05); }
+    .primary-gradient { background: linear-gradient(135deg, #4c6635 0%, #a6c48a 100%); }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+
+<!-- Brand wordmark — fixed top center -->
+<div class="mol-brand" aria-label="MolSight">
+    <svg width="36" height="36" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="13,1.5 23.66,7.5 23.66,18.5 13,24.5 2.34,18.5 2.34,7.5" stroke="#4c6635" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+        <circle cx="13" cy="13" r="2.2" fill="#4c6635"/>
+        <line x1="13" y1="7.5" x2="13" y2="10.8" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="13" y1="15.2" x2="13" y2="18.5" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="8.2" y1="10.25" x2="11.1" y2="11.9" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="14.9" y1="14.1" x2="17.8" y2="15.75" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="17.8" y1="10.25" x2="14.9" y2="11.9" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="11.1" y1="14.1" x2="8.2" y2="15.75" stroke="#4c6635" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <span>MolSight</span>
+</div>
+
+<!-- Pill nav — fixed bottom center -->
+<div class="mol-header">
+
+    <!-- Dropdown (rendered first so it sits above the pill with column-reverse) -->
+    <div class="mol-nav-mobile" id="molNavMobile" hidden>
+        <a href="/" class="mol-nav-mobile-link{% if request.endpoint in ('home', 'calculate') %} is-active{% endif %}">Analyze</a>
+        <a href="/compare" class="mol-nav-mobile-link{% if request.endpoint in ('compare', 'compare_result') %} is-active{% endif %}">Compare</a>
+        <a href="/guide" class="mol-nav-mobile-link{% if request.endpoint == 'guide' %} is-active{% endif %}">Guide</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="mol-nav-mobile-link">GitHub ↗</a>
+    </div>
+
+    <nav class="mol-nav" role="navigation" aria-label="Main navigation">
+
+        <!-- Left: Logo mark -->
+        <a href="/" class="mol-nav-logo" aria-label="MolSight home">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <polygon points="13,1.5 23.66,7.5 23.66,18.5 13,24.5 2.34,18.5 2.34,7.5" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+                <circle cx="13" cy="13" r="2.2" fill="rgba(255,255,255,0.85)"/>
+                <line x1="13" y1="7.5" x2="13" y2="10.8" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="13" y1="15.2" x2="13" y2="18.5" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="8.2" y1="10.25" x2="11.1" y2="11.9" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="14.9" y1="14.1" x2="17.8" y2="15.75" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="17.8" y1="10.25" x2="14.9" y2="11.9" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="11.1" y1="14.1" x2="8.2" y2="15.75" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+        </a>
+
+        <!-- Center: Current page name -->
+        <span class="mol-nav-page">
+            {%- if request.endpoint in ('home', 'calculate') %}Analyze
+            {%- elif request.endpoint in ('compare', 'compare_result') %}Compare
+            {%- elif request.endpoint == 'guide' %}Guide
+            {%- else %}MolSight
+            {%- endif %}
+        </span>
+
+        <!-- Right: Hamburger -->
+        <button class="mol-nav-toggle" id="molNavToggle" aria-label="Open menu" aria-expanded="false" aria-controls="molNavMobile">
+            <span></span><span></span><span></span>
+        </button>
+
+    </nav>
+</div>
+
+<script>
+(function () {
+    var toggle = document.getElementById('molNavToggle');
+    var menu   = document.getElementById('molNavMobile');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', function () {
+        var open = menu.hasAttribute('hidden');
+        menu.toggleAttribute('hidden', !open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+})();
+</script>
+
+{% block content %}{% endblock %}
+
+<!-- Footer -->
+<footer class="bg-[#f3f4f0] border-t border-[#c4c8ba]/20 py-12 mt-auto">
+    <div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto gap-8">
+        <div class="flex flex-col gap-2">
+            <span class="text-lg font-headline italic text-on-background">MolSight</span>
+            <p class="font-label text-[0.6875rem] uppercase tracking-widest text-stone-500">Molecular Descriptor Calculator</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            <a class="font-label text-[0.6875rem] uppercase tracking-widest text-stone-500 hover:text-primary transition-colors" href="/">Single Molecule</a>
+            <a class="font-label text-[0.6875rem] uppercase tracking-widest text-stone-500 hover:text-primary transition-colors" href="/compare">Compare</a>
+            <a class="font-label text-[0.6875rem] uppercase tracking-widest text-stone-500 hover:text-primary transition-colors" href="/guide">Descriptor Guide</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

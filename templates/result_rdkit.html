@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %} — Analysis Results{% endblock %}
+
+{% block content %}
+<main class="flex-grow">
+    <!-- Editorial Hero Header -->
+    <div class="px-8 md:px-12 max-w-[1440px] mx-auto pt-16 pb-10">
+        <div class="mb-4">
+            <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-[0.6875rem] font-semibold uppercase tracking-widest">Analysis Complete</span>
+        </div>
+        <h1 class="font-headline italic text-5xl md:text-6xl text-on-surface mb-5 leading-tight">
+            {% if data["molecule_name"] != "Not available" %}
+                {{ data["molecule_name"] }}
+            {% else %}
+                Molecular Profile
+            {% endif %}
+        </h1>
+        <p class="text-on-surface-variant text-lg max-w-2xl leading-relaxed">
+            Comprehensive evaluation of the submitted structure against pharmacological standards, emphasising Lipinski compliance and physicochemical descriptors.
+        </p>
+    </div>
+
+    <!-- Asymmetric Bento Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start px-8 md:px-12 max-w-[1440px] mx-auto pb-24">
+
+        <!-- Left Column: Structure + Descriptors -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Structure + Identity -->
+            <section class="bg-surface-container-lowest rounded-lg p-8 ambient-shadow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-headline text-2xl italic mb-5">Structural Visualisation</h3>
+                        <div class="aspect-square rounded-lg bg-surface-container flex items-center justify-center p-4">
+                            {% if mol_image %}
+                                <img class="max-w-full h-auto opacity-90" src="{{ mol_image }}" alt="2D structure of {{ smiles }}"/>
+                            {% else %}
+                                <p class="text-error text-sm text-center">Could not generate structure image.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center gap-5">
+                        <div>
+                            <label class="block font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-2">Molecule Name</label>
+                            <div class="bg-surface-container-low p-4 rounded-lg text-sm font-medium text-primary break-words leading-snug">{{ data["molecule_name"] }}</div>
+                        </div>
+                        <div>
+                            <label class="block font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-2">Molecular Formula</label>
+                            <div class="bg-surface-container-low p-4 rounded-lg text-sm font-mono font-semibold text-on-surface">{{ data["Molecular Formula"] }}</div>
+                        </div>
+                        <div>
+                            <label class="block font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-2">Input SMILES</label>
+                            <div class="bg-surface-container-low p-4 rounded-lg text-sm font-mono break-all text-on-surface leading-tight">{{ smiles }}</div>
+                        </div>
+                        <div>
+                            <label class="block font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-2">Canonical SMILES</label>
+                            <div class="bg-surface-variant/30 p-4 rounded-lg text-sm font-mono break-all text-on-surface-variant leading-tight">{{ canonical_smiles }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Descriptor Cards Grid -->
+            <section>
+                <h3 class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-4 px-1">Molecular Descriptors</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for key, value in data.items() %}
+                    {% if key not in ("molecule_name", "Molecular Formula") %}
+                    <div class="bg-surface-container-low p-6 rounded-lg">
+                        <label class="block font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant mb-2">{{ key }}</label>
+                        <div class="text-2xl font-headline italic text-on-surface">
+                            {{ value }}{% if key == "Molecular Weight" %}<span class="text-sm font-body not-italic text-stone-400 ml-1">g/mol</span>{% endif %}{% if key == "TPSA" %}<span class="text-sm font-body not-italic text-stone-400 ml-1">Å²</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Sticky Verdict -->
+        <aside class="lg:col-span-5 space-y-6 lg:sticky lg:top-28">
+
+            <!-- Drug-Likeness Verdict Card -->
+            <div class="bg-[#EEF1EB] rounded-xl p-8 ambient-shadow border-l-4 border-primary">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="font-headline text-2xl italic">Drug-Likeness Verdict</h3>
+                        <p class="font-label text-[0.6875rem] uppercase tracking-widest font-bold mt-1
+                            {% if lipinski.violations == 0 %}text-primary{% elif lipinski.violations == 1 %}text-amber-600{% else %}text-error{% endif %}">
+                            {% if lipinski.violations == 0 %}Highly Favorable
+                            {% elif lipinski.violations == 1 %}Acceptable
+                            {% else %}Unfavorable{% endif %}
+                        </p>
+                    </div>
+                    {% if lipinski.drug_like %}
+                    <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    {% else %}
+                    <span class="material-symbols-outlined text-4xl text-error" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                    {% endif %}
+                </div>
+                <div class="mb-8">
+                    <div class="flex items-baseline gap-2 mb-3">
+                        <span class="text-4xl font-headline font-bold">{{ lipinski.violations }}</span>
+                        <span class="text-on-surface-variant uppercase text-xs tracking-tight">/ 4 violations detected</span>
+                    </div>
+                    <p class="text-sm text-on-surface-variant leading-relaxed">{{ lipinski.interpretation }}</p>
+                </div>
+                <div class="space-y-3">
+                    <form action="/export_csv" method="POST">
+                        <input type="hidden" name="smiles" value="{{ smiles }}">
+                        <button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold flex items-center justify-center gap-2 ambient-shadow hover:opacity-90 transition-opacity text-sm" type="submit">
+                            <span class="material-symbols-outlined">download</span>
+                            Download CSV Report
+                        </button>
+                    </form>
+                    <a href="/" class="w-full bg-primary-container/30 text-on-primary-container py-4 rounded-lg font-bold hover:bg-primary-container/50 transition-colors flex items-center justify-center text-sm">
+                        Analyse Another Molecule
+                    </a>
+                    <a href="/compare" class="block w-full text-center font-label text-[0.6875rem] uppercase tracking-widest text-primary hover:text-primary/70 transition-colors py-2">
+                        Compare Two Molecules →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lipinski Breakdown -->
+            <div class="bg-surface-container-low rounded-lg p-8">
+                <h4 class="font-headline text-xl italic mb-6">Lipinski Rule Breakdown</h4>
+                <ul class="space-y-5">
+                    {% for rule, passed in lipinski.rules.items() %}
+                    <li class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-on-surface">{{ rule }}</span>
+                        <div class="flex items-center gap-2">
+                            {% if passed %}
+                            <span class="text-[0.6875rem] font-bold text-[#7AA874] uppercase tracking-widest bg-[#7AA874]/10 px-2 py-0.5 rounded-full">Pass</span>
+                            <span class="material-symbols-outlined text-[#7AA874] text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            {% else %}
+                            <span class="text-[0.6875rem] font-bold text-red-600 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-full">Fail</span>
+                            <span class="material-symbols-outlined text-red-600 text-xl" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-6 pt-6 border-t border-outline-variant/10">
+                    <p class="text-[0.6875rem] text-on-surface-variant leading-relaxed">
+                        Lipinski's Rule of Five is a guideline for oral drug-likeness, not a definitive predictor of clinical efficacy or safety.
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+{% endblock %}

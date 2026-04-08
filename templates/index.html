@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %} — Molecular Analysis{% endblock %}
+
+{% block content %}
+<main class="flex-grow">
+    <!-- Hero -->
+    <section class="pt-20 pb-12 px-8 md:px-12 max-w-[1440px] mx-auto">
+        <div class="max-w-2xl">
+            <span class="inline-block px-3 py-1 bg-primary-container/20 text-on-primary-container text-[0.6875rem] uppercase tracking-widest font-bold rounded-full mb-6">
+                Molecular Insight Engine
+            </span>
+            <h1 class="font-headline text-5xl md:text-6xl leading-[1.1] text-on-background mb-6 italic">
+                The Narrative of<br/>
+                <span class="text-primary not-italic font-medium">Single Molecules</span>
+            </h1>
+            <p class="font-body text-lg text-on-surface-variant leading-relaxed">
+                Transforming structural data into editorial clarity. Calculate descriptors, assess drug-likeness, and explore the pharmacochemical profile of any compound.
+            </p>
+        </div>
+    </section>
+
+    <!-- Input Section -->
+    <section class="px-8 md:px-12 max-w-[1440px] mx-auto pb-24">
+        <div class="bg-surface-container-low rounded-[2rem] p-1">
+            <div class="bg-surface-container-lowest rounded-[1.85rem] p-8 md:p-12 ambient-shadow">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <!-- Form -->
+                    <div>
+                        <div class="mb-10">
+                            <h3 class="font-headline text-3xl italic mb-3">Molecular Entry</h3>
+                            <p class="font-body text-on-surface-variant text-sm">Input a SMILES string below to initiate structural profiling and drug-likeness assessment.</p>
+                        </div>
+                        <form action="/calculate" method="POST" class="space-y-6">
+                            <div>
+                                <label class="block font-label text-[0.6875rem] uppercase tracking-widest mb-2 text-on-surface/60 px-1" for="smiles">SMILES Notation</label>
+                                <input class="w-full bg-surface text-on-surface border-none focus:ring-1 focus:ring-primary/40 rounded-xl py-5 px-6 font-mono text-sm placeholder:text-outline-variant transition-all duration-300"
+                                       id="smiles" name="smiles" placeholder="e.g. CC(=O)OC1=CC=CC=C1C(=O)O" required type="text"/>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface/40 mr-1">Quick load:</span>
+                                <button type="button" onclick="document.getElementById('smiles').value='CC(=O)Oc1ccccc1C(=O)O'"
+                                        class="px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 text-on-surface-variant text-[0.6875rem] font-bold rounded-full transition-colors uppercase tracking-wider">Aspirin</button>
+                                <button type="button" onclick="document.getElementById('smiles').value='Cn1cnc2c1c(=O)n(c(=O)n2C)C'"
+                                        class="px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 text-on-surface-variant text-[0.6875rem] font-bold rounded-full transition-colors uppercase tracking-wider">Caffeine</button>
+                                <button type="button" onclick="document.getElementById('smiles').value='CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O'"
+                                        class="px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 text-on-surface-variant text-[0.6875rem] font-bold rounded-full transition-colors uppercase tracking-wider">Ibuprofen</button>
+                                <button type="button" onclick="document.getElementById('smiles').value='CC(=O)Nc1ccc(O)cc1'"
+                                        class="px-4 py-2 bg-surface-container-high hover:bg-primary-container/20 text-on-surface-variant text-[0.6875rem] font-bold rounded-full transition-colors uppercase tracking-wider">Paracetamol</button>
+                            </div>
+                            {% if error %}
+                            <div class="flex items-center gap-3 bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                                <span class="material-symbols-outlined text-lg">error_outline</span>
+                                {{ error }}
+                            </div>
+                            {% endif %}
+                            <div class="pt-2">
+                                <button class="primary-gradient text-on-primary px-10 py-5 rounded-xl font-bold uppercase tracking-[0.1em] text-xs hover:opacity-90 transition-all flex items-center gap-3 ambient-shadow" type="submit">
+                                    Analyse Structure
+                                    <span class="material-symbols-outlined text-lg">arrow_forward_ios</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Info Side -->
+                    <div class="flex flex-col justify-center border-l border-outline-variant/20 pl-0 lg:pl-16">
+                        <div class="space-y-10">
+                            <div class="flex gap-6">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+                                    <span class="material-symbols-outlined">biotech</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-headline text-xl italic mb-2">What is SMILES?</h4>
+                                    <p class="font-body text-sm text-on-surface-variant leading-relaxed">
+                                        The Simplified Molecular Input Line Entry System (SMILES) is a line notation for describing chemical structures using short ASCII strings. It encodes atoms, bonds, and branching into a linear form.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                    <span class="material-symbols-outlined">query_stats</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-headline text-xl italic mb-2">What You Get</h4>
+                                    <p class="font-body text-sm text-on-surface-variant leading-relaxed">
+                                        Lipinski Rule of Five compliance, logP estimation, polar surface area mapping, rotatable bond counts, and IUPAC name lookup — all presented through a curated analytical lens.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %} — Comparison Results{% endblock %}
+
+{% block content %}
+<main class="flex-grow px-8 md:px-12 py-16 max-w-[1440px] mx-auto w-full">
+
+    <header class="mb-12 max-w-3xl">
+        <h1 class="text-5xl font-headline italic tracking-tight text-on-background mb-4">Molar Comparison Analysis</h1>
+        <p class="text-on-surface-variant font-body leading-relaxed max-w-2xl">
+            Side-by-side structural and pharmacochemical evaluation of candidate molecules, curated against canonical descriptors and Lipinski guidelines.
+        </p>
+    </header>
+
+    <!-- Two Molecule Panels -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+
+        <!-- Molecule 1 Panel -->
+        <section class="flex flex-col gap-0">
+            <div class="flex items-baseline justify-between mb-4">
+                <span class="font-label text-[0.6875rem] uppercase tracking-widest text-primary font-bold">Subject Alpha</span>
+                <h2 class="font-headline italic text-xl">
+                    {% if mol1.data["molecule_name"] != "Not available" %}{{ mol1.data["molecule_name"][:30] }}{% if mol1.data["molecule_name"]|length > 30 %}…{% endif %}
+                    {% else %}Molecule 1{% endif %}
+                </h2>
+            </div>
+            <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+                <div class="bg-white p-8 flex items-center justify-center" style="aspect-ratio:1;">
+                    {% if mol1.mol_image %}
+                        <img class="max-w-full max-h-full object-contain mix-blend-multiply opacity-90" src="{{ mol1.mol_image }}" alt="Molecule 1 structure"/>
+                    {% else %}
+                        <p class="text-red-500 text-sm text-center">Image unavailable</p>
+                    {% endif %}
+                </div>
+                <div class="p-8 space-y-7">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Molecule Name</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block text-primary leading-tight font-medium">{{ mol1.data["molecule_name"] }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Molecular Formula</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block text-on-surface font-mono leading-tight">{{ mol1.data["Molecular Formula"] }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Input SMILES</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block break-all font-mono text-primary leading-tight">{{ mol1.smiles }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Canonical SMILES</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block break-all font-mono text-on-surface-variant leading-tight">{{ mol1.canonical_smiles }}</code>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for key, value in mol1.data.items() %}
+                        {% if key not in ("molecule_name", "Molecular Formula") %}
+                        <div class="bg-surface-container-lowest p-4 rounded-lg">
+                            <span class="block font-label text-[0.6rem] uppercase tracking-wider text-stone-500 mb-1">{{ key }}</span>
+                            <span class="text-base font-semibold text-on-background">{{ value }}{% if key == "Molecular Weight" %}<small class="text-[10px] font-normal ml-0.5">g/mol</small>{% endif %}{% if key == "TPSA" %}<small class="text-[10px] font-normal ml-0.5">Å²</small>{% endif %}</span>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">Lipinski Summary</label>
+                            {% if mol1.lipinski.drug_like %}
+                            <span class="px-3 py-1 bg-[#7AA874]/10 text-[#4c6635] text-[0.6rem] font-bold uppercase tracking-widest rounded-full">{{ mol1.lipinski.violations }} Violation{{ 's' if mol1.lipinski.violations != 1 }} — Pass</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-red-50 text-red-700 text-[0.6rem] font-bold uppercase tracking-widest rounded-full">{{ mol1.lipinski.violations }} Violations — Fail</span>
+                            {% endif %}
+                        </div>
+                        <div class="space-y-2">
+                            {% for rule, passed in mol1.lipinski.rules.items() %}
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-on-surface-variant">{{ rule }}</span>
+                                {% if passed %}<span class="font-medium text-[#4c6635]">Pass</span>
+                                {% else %}<span class="font-medium text-red-600">Fail</span>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Molecule 2 Panel -->
+        <section class="flex flex-col gap-0">
+            <div class="flex items-baseline justify-between mb-4">
+                <span class="font-label text-[0.6875rem] uppercase tracking-widest text-primary font-bold">Subject Beta</span>
+                <h2 class="font-headline italic text-xl">
+                    {% if mol2.data["molecule_name"] != "Not available" %}{{ mol2.data["molecule_name"][:30] }}{% if mol2.data["molecule_name"]|length > 30 %}…{% endif %}
+                    {% else %}Molecule 2{% endif %}
+                </h2>
+            </div>
+            <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col h-full ambient-shadow">
+                <div class="bg-white p-8 flex items-center justify-center" style="aspect-ratio:1;">
+                    {% if mol2.mol_image %}
+                        <img class="max-w-full max-h-full object-contain mix-blend-multiply opacity-90" src="{{ mol2.mol_image }}" alt="Molecule 2 structure"/>
+                    {% else %}
+                        <p class="text-red-500 text-sm text-center">Image unavailable</p>
+                    {% endif %}
+                </div>
+                <div class="p-8 space-y-7">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Molecule Name</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block text-primary leading-tight font-medium">{{ mol2.data["molecule_name"] }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Molecular Formula</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block text-on-surface font-mono leading-tight">{{ mol2.data["Molecular Formula"] }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Input SMILES</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block break-all font-mono text-primary leading-tight">{{ mol2.smiles }}</code>
+                        </div>
+                        <div>
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant block mb-1">Canonical SMILES</label>
+                            <code class="text-xs bg-surface-variant/40 px-3 py-2 rounded block break-all font-mono text-on-surface-variant leading-tight">{{ mol2.canonical_smiles }}</code>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for key, value in mol2.data.items() %}
+                        {% if key not in ("molecule_name", "Molecular Formula") %}
+                        <div class="bg-surface-container-lowest p-4 rounded-lg">
+                            <span class="block font-label text-[0.6rem] uppercase tracking-wider text-stone-500 mb-1">{{ key }}</span>
+                            <span class="text-base font-semibold text-on-background">{{ value }}{% if key == "Molecular Weight" %}<small class="text-[10px] font-normal ml-0.5">g/mol</small>{% endif %}{% if key == "TPSA" %}<small class="text-[10px] font-normal ml-0.5">Å²</small>{% endif %}</span>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface-variant">Lipinski Summary</label>
+                            {% if mol2.lipinski.drug_like %}
+                            <span class="px-3 py-1 bg-[#7AA874]/10 text-[#4c6635] text-[0.6rem] font-bold uppercase tracking-widest rounded-full">{{ mol2.lipinski.violations }} Violation{{ 's' if mol2.lipinski.violations != 1 }} — Pass</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-red-50 text-red-700 text-[0.6rem] font-bold uppercase tracking-widest rounded-full">{{ mol2.lipinski.violations }} Violations — Fail</span>
+                            {% endif %}
+                        </div>
+                        <div class="space-y-2">
+                            {% for rule, passed in mol2.lipinski.rules.items() %}
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-on-surface-variant">{{ rule }}</span>
+                                {% if passed %}<span class="font-medium text-[#4c6635]">Pass</span>
+                                {% else %}<span class="font-medium text-red-600">Fail</span>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Cross-Analytical Breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div class="lg:col-span-1 bg-primary p-8 rounded-xl text-on-primary flex flex-col justify-between ambient-shadow">
+            <div>
+                <span class="material-symbols-outlined mb-6 text-primary-container" style="font-size:2rem; font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                <h3 class="text-2xl font-headline italic mb-4">Comparative Verdict</h3>
+                <div class="text-sm opacity-90 leading-relaxed space-y-4">
+                    <div>
+                        <p class="font-label text-[0.6875rem] uppercase tracking-widest text-primary-container mb-1">Subject Alpha</p>
+                        <p>{{ mol1.lipinski.interpretation }}</p>
+                    </div>
+                    <div>
+                        <p class="font-label text-[0.6875rem] uppercase tracking-widest text-primary-container mb-1">Subject Beta</p>
+                        <p>{{ mol2.lipinski.interpretation }}</p>
+                    </div>
+                </div>
+            </div>
+            <a href="/compare" class="mt-8 block py-3 px-6 bg-primary-container text-on-primary-container font-label text-[0.6875rem] uppercase tracking-widest font-bold rounded-lg hover:bg-white transition-colors text-center">
+                New Comparison
+            </a>
+        </div>
+        <div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl ambient-shadow">
+            <h4 class="font-label text-[0.6875rem] uppercase tracking-widest text-stone-500 mb-6">Cross-Analytical Breakdown</h4>
+            <div class="grid grid-cols-3 gap-0 mb-4 text-[0.6875rem] font-label uppercase tracking-widest text-on-surface-variant">
+                <span>Descriptor</span>
+                <span class="text-primary font-bold">Subject Alpha</span>
+                <span class="text-secondary font-bold">Subject Beta</span>
+            </div>
+            <div class="space-y-0">
+                {% for key in mol1.data %}
+                {% if key not in ("molecule_name", "Molecular Formula") %}
+                <div class="grid grid-cols-3 gap-0 py-3 border-b border-outline-variant/10 items-center">
+                    <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-tighter">{{ key }}</span>
+                    <span class="text-sm font-medium text-on-surface">{{ mol1.data[key] }}{% if key == "TPSA" %} Å²{% endif %}{% if key == "Molecular Weight" %} g/mol{% endif %}</span>
+                    <span class="text-sm font-medium text-on-surface">{{ mol2.data[key] }}{% if key == "TPSA" %} Å²{% endif %}{% if key == "Molecular Weight" %} g/mol{% endif %}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-[0.6875rem] text-on-surface-variant mt-6 leading-relaxed">
+                Lipinski's Rule of Five is a guideline for oral drug-likeness, not a definitive predictor of clinical efficacy or safety.
+            </p>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap gap-4">
+        <a href="/compare" class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all">New Comparison</a>
+        <a href="/" class="bg-surface-container-low text-on-surface px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-surface-container transition-colors">Single Molecule Analysis</a>
+    </div>
+
+</main>
+{% endblock %}
