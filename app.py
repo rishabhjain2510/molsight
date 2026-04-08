@@ -86,7 +86,7 @@ def compare():
     return render_template("compare.html")
 
 
-@app.route("/guide")
+@app.route("/guide") 
 def guide():
     return render_template("guide.html")
 
@@ -112,4 +112,4 @@ def compare_result():
 
 
 if __name__ == "__main__":
-    app.run(debug=os.environ.get("FLASK_DEBUG", "false").lower() == "true")
+    app.run(debug=True)
