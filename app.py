@@ -3,7 +3,7 @@ import io
 import os
 from flask import Flask, render_template, request, Response
 from utils.descriptor_calc import calculate_descriptors
-from utils.drug_likeness import check_lipinski
+from utils.drug_likeness import check_lipinski, bioavailability_score, generate_interpretation, get_descriptor_status
 from utils.mol_image import smiles_to_base64_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,12 +16,17 @@ def _analyse(smiles):
     result, canonical_smiles = calculate_descriptors(smiles)
     if result is None:
         return None
+    lipinski = check_lipinski(result)
+    bio_score = bioavailability_score(lipinski, result)
     return {
         "smiles":           smiles,
         "canonical_smiles": canonical_smiles,
         "data":             result,
-        "lipinski":         check_lipinski(result),
+        "lipinski":         lipinski,
         "mol_image":        smiles_to_base64_image(smiles),
+        "bio_score":         bio_score,
+        "interpretation":    generate_interpretation(result, lipinski, bio_score),
+        "descriptor_status": get_descriptor_status(result),
     }
 
 
@@ -41,7 +46,10 @@ def calculate():
 
     lipinski = check_lipinski(result)
     mol_image = smiles_to_base64_image(smiles)
-    return render_template("result_rdkit.html", data=result, smiles=smiles, lipinski=lipinski, mol_image=mol_image, canonical_smiles=canonical_smiles)
+    bio_score = bioavailability_score(lipinski, result)
+    interpretation = generate_interpretation(result, lipinski, bio_score)
+    descriptor_status = get_descriptor_status(result)
+    return render_template("result_rdkit.html", data=result, smiles=smiles, lipinski=lipinski, mol_image=mol_image, canonical_smiles=canonical_smiles, bio_score=bio_score, interpretation=interpretation, descriptor_status=descriptor_status)
 
 
 @app.route("/export_csv", methods=["POST"])
@@ -96,10 +104,18 @@ def compare_result():
     smiles1 = request.form.get("smiles1", "").strip()
     smiles2 = request.form.get("smiles2", "").strip()
 
+    errors = {}
+    if not smiles1:
+        errors["smiles1"] = "Please enter a SMILES string for Molecule 1"
+    if not smiles2:
+        errors["smiles2"] = "Please enter a SMILES string for Molecule 2"
+
+    if errors:
+        return render_template("compare.html", errors=errors, smiles1=smiles1, smiles2=smiles2)
+
     mol1 = _analyse(smiles1)
     mol2 = _analyse(smiles2)
 
-    errors = {}
     if mol1 is None:
         errors["smiles1"] = "Invalid SMILES for Molecule 1"
     if mol2 is None:

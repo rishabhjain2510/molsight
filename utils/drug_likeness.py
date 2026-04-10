@@ -37,3 +37,67 @@ def check_lipinski(descriptors):
         "drug_like": violations == 0,
         "interpretation": interpretation,
     }
+
+
+def get_descriptor_status(descriptors):
+    def _tier(value, good_max, borderline_max):
+        if value <= good_max:
+            return "good", "Optimal"
+        if value <= borderline_max:
+            return "borderline", "Borderline"
+        return "bad", "Too high"
+
+    mw_s,  mw_m  = _tier(descriptors["Molecular Weight"], 500, 600)
+    logp_s, logp_m = _tier(descriptors["LogP"], 5, 6)
+    hbd_s,  hbd_m  = _tier(descriptors["H-Bond Donors"], 5, 7)
+    hba_s,  hba_m  = _tier(descriptors["H-Bond Acceptors"], 10, 12)
+    tpsa_s, tpsa_m = _tier(descriptors["TPSA"], 140, 160)
+    rb_s,   rb_m   = _tier(descriptors["Rotatable Bonds"], 10, 15)
+
+    return {
+        "Molecular Weight":  {"status": mw_s,   "message": mw_m},
+        "LogP":              {"status": logp_s,  "message": logp_m},
+        "H-Bond Donors":     {"status": hbd_s,   "message": hbd_m},
+        "H-Bond Acceptors":  {"status": hba_s,   "message": hba_m},
+        "TPSA":              {"status": tpsa_s,  "message": tpsa_m},
+        "Rotatable Bonds":   {"status": rb_s,    "message": rb_m},
+    }
+
+
+def generate_interpretation(descriptors, lipinski, bio_score):
+    if bio_score > 0.75:
+        verdict = "Excellent drug-likeness"
+    elif bio_score >= 0.6:
+        verdict = "Good drug-likeness"
+    elif bio_score >= 0.4:
+        verdict = "Moderate drug-likeness"
+    else:
+        verdict = "Poor drug-likeness"
+
+    sentences = [f"This molecule shows {verdict.lower()}."]
+
+    if lipinski["violations"] == 0:
+        sentences.append("No Lipinski violations were observed.")
+    else:
+        sentences.append(f"There are {lipinski['violations']} Lipinski rule violation{'s' if lipinski['violations'] != 1 else ''}.")
+
+    if descriptors["LogP"] > 5:
+        sentences.append("High LogP may reduce solubility.")
+    if descriptors["TPSA"] > 140:
+        sentences.append("High TPSA may reduce membrane permeability.")
+    if descriptors["Molecular Weight"] > 500:
+        sentences.append("High molecular weight may reduce absorption.")
+
+    return {"verdict": verdict, "summary": " ".join(sentences)}
+
+
+def bioavailability_score(lipinski_result, descriptors):
+    score = 1.0
+    score -= lipinski_result["violations"] * 0.15
+    if descriptors["LogP"] > 5:
+        score -= 0.1
+    if descriptors["TPSA"] > 140:
+        score -= 0.1
+    if descriptors["Molecular Weight"] > 500:
+        score -= 0.1
+    return round(max(0.0, min(1.0, score)), 2)

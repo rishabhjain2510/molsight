@@ -570,6 +570,86 @@ body {
     line-height: 1.7;
 }
 
+/* ── Loading spinner ── */
+@keyframes mol-spin {
+    to { transform: rotate(360deg); }
+}
+
+.mol-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: mol-spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Descriptor status badges ── */
+.ds-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 9999px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+}
+
+.good       { background: #dcfce7; color: #15803d; }
+.borderline { background: #fef9c3; color: #a16207; }
+.bad        { background: #fee2e2; color: #b91c1c; }
+
+/* ── UI Polish ── */
+
+/* Descriptor cards — lift on hover */
+.mol-descriptor-card {
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.mol-descriptor-card:hover {
+    box-shadow:
+        0 2px 8px  rgba(26, 28, 26, 0.09),
+        0 12px 32px rgba(26, 28, 26, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Lipinski rule list items — subtle row highlight */
+.mol-lipinski-item {
+    padding: 6px 8px;
+    margin: 0 -8px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+.mol-lipinski-item:hover {
+    background: rgba(76, 102, 53, 0.05);
+}
+
+/* Cross-analytical table rows — hover tint */
+.mol-table-row {
+    transition: background 0.15s ease;
+    border-radius: 4px;
+}
+.mol-table-row:hover {
+    background: rgba(76, 102, 53, 0.04);
+}
+
+/* Code/SMILES display blocks — subtle definition border */
+.mol-code-block {
+    border: 1px solid rgba(196, 200, 186, 0.5);
+    transition: border-color 0.15s ease;
+}
+.mol-code-block:hover {
+    border-color: rgba(76, 102, 53, 0.25);
+}
+
+/* Disabled button — reinforce cursor */
+button:disabled,
+button[disabled] {
+    cursor: not-allowed;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
     .mol-grid { grid-template-columns: 1fr; }
