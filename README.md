@@ -10,6 +10,9 @@ A Flask-based cheminformatics web app for molecular descriptor calculation and d
 - **IUPAC Name Lookup** — PubChem REST API integration
 - **Canonical SMILES** — normalised via RDKit
 - **Drug-likeness Verdict** — Lipinski Ro5 with per-rule pass/fail badges and interpretation
+- **Bioavailability Score** — composite 0–1 score derived from Lipinski violations and key descriptor penalties
+- **Rule-based Interpretation Engine** — plain-language verdict and flagged issues (high LogP, TPSA, MW)
+- **Color-coded Descriptor Feedback** — per-descriptor Optimal / Borderline / Too High status badges
 - **Molecule Comparison** — side-by-side analysis of two molecules with a unified descriptor table
 - **CSV Export** — download full results including descriptors and Lipinski breakdown
 - **Descriptor Guide** — reference page explaining each descriptor with thresholds and clinical context
@@ -24,13 +27,13 @@ A Flask-based cheminformatics web app for molecular descriptor calculation and d
 ## Project Structure
 
 ```
-molfeature/
+molsight/
 ├── app.py
 ├── requirements.txt
 ├── Procfile
 ├── runtime.txt
 ├── static/
-│   ├── css/
+│   └── css/
 │       └── style.css
 ├── templates/
 │   ├── base.html
