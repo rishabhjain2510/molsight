@@ -35,6 +35,16 @@
                                 <label class="block font-label text-[0.6875rem] uppercase tracking-widest mb-2 text-on-surface/60 px-1" for="smiles">SMILES Notation</label>
                                 <input class="w-full bg-surface text-on-surface border-none focus:ring-1 focus:ring-primary/40 rounded-xl py-5 px-6 font-mono text-sm placeholder:text-outline-variant transition-all duration-300"
                                        id="smiles" name="smiles" placeholder="e.g. CC(=O)OC1=CC=CC=C1C(=O)O" required type="text"/>
+                                <div class="mt-3 flex items-start gap-2.5 bg-primary-container/10 border border-primary/10 rounded-xl px-4 py-3">
+                                    <span class="material-symbols-outlined text-primary/50 text-base mt-0.5 flex-shrink-0">info</span>
+                                    <p class="text-xs text-on-surface-variant font-body leading-relaxed">
+                                        Don't have a SMILES string? Look up any molecule on
+                                        <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" class="font-semibold text-primary hover:underline underline-offset-2 transition-colors">PubChem</a>
+                                        or
+                                        <a href="https://www.chemspider.com/" target="_blank" rel="noopener noreferrer" class="font-semibold text-primary hover:underline underline-offset-2 transition-colors">ChemSpider</a>
+                                        and copy the SMILES from there.
+                                    </p>
+                                </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
                                 <span class="font-label text-[0.6875rem] uppercase tracking-widest text-on-surface/40 mr-1">Quick load:</span>
